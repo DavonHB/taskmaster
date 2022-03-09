@@ -54,9 +54,9 @@ $(".list-group").on("click", "p", function() {
     .addClass("form-control")
     .val(text);
 
-    $(this).replaceWith(textInput);
+  $(this).replaceWith(textInput);
 
-    textInput.trigger("focus");
+  textInput.trigger("focus");
 });
 
 $(".list-group").on("blur", "textarea", function (){
@@ -98,10 +98,9 @@ $(".list-group").on("click", "span", function() {
   dateInput.trigger("focus");
 });
 
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("change", "input[type='text']", function() {
   var date = $(this)
-  .val()
-  .trim();
+  .val();
 
 var status = $(this)
   .closest(".list-group")
@@ -114,6 +113,7 @@ var index = $(this)
 
 tasks[status][index].date = date;
 saveTasks();
+
 var taskSpan = $("<span>")
   .addClass("badge badge-primary badge-pill")
   .text(date);
@@ -162,6 +162,65 @@ $("#remove-tasks").on("click", function() {
     $("#list-" + key).empty();
   }
   saveTasks();
+});
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event, ui) {
+    console.log(ui);
+  },
+  deactivate: function(event, ui) {
+    console.log(ui);
+  },
+  over: function(event) {
+    console.log(event);
+  },
+  out: function(event) {
+    console.log(event);
+  },
+  update: function(event) {
+    var tempArr = [];
+
+    $(this).children().each(function(){
+      tempArr.push({
+        text: $(this)
+          .find("p")
+          .text()
+          .trim(),
+        date: $(this)
+          .find("span")
+          .text()
+          .trim()
+      });
+    });
+
+    var arrName = $(this)
+      .attr("id")
+      .replace("list-", "");
+
+    tasks[arrName] = tempArr;
+    saveTasks();
+  },
+  stop: function(event) {
+    $(this).removeClass("dropover");
+  }
+});
+
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    console.log(ui);
+  },
+  out: function(event, ui) {
+    console.log(ui);
+  }
 });
 
 // load tasks for the first time
